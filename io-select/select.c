@@ -4,8 +4,7 @@
 #define IPADDR "127.0.0.1"
 #define BACKLOG 10
 
-int main(void)
-{
+int main(void) {
   // 1) 可读、可写、异常3种文件描述符集的声明和初始化
   fd_set readfds, writefds, exceptfds;
   FD_ZERO(&readfds);
@@ -15,7 +14,7 @@ int main(void)
 
   // 2) tcp socket配置和监听
   int sock_listen = socket(AF_INET, SOCK_STREAM, 0);
-  if(sock_listen < 0) {
+  if (sock_listen < 0) {
     perror("create listening socket failed\n");
     return 1;
   }
@@ -24,21 +23,21 @@ int main(void)
   struct sockaddr_in addr_listen;
   addr_listen.sin_family = AF_INET;
   addr_listen.sin_port = htons(PORT);
-  if(!inet_aton(IPADDR, &addr_listen.sin_addr)) {
-    fprintf(stderr, "initialize ipv4 address failed, ipaddr = %s", IPADDR);
+  if (!inet_aton(IPADDR, &addr_listen.sin_addr)) {
+    printf(stderr, "initialize ipv4 address failed, ipaddr = %s", IPADDR);
     perror(strerror(errno));
     return 1;
   }
   printf("initialize ipv4 address success, ipaddr = %s\n", IPADDR);
   // 3) 绑定监听
-  if(bind(sock_listen, (struct sockaddr *)&addr_listen, sizeof(addr_listen)) < 0) {
+  if (bind(sock_listen, (struct sockaddr *) &addr_listen, sizeof(addr_listen)) < 0) {
     perror("bind socket & addr failed\n");
     perror(strerror(errno));
     return 1;
   }
   printf("bind socket & addr success\n");
 
-  if(listen(sock_listen, BACKLOG) < 0) {
+  if (listen(sock_listen, BACKLOG) < 0) {
     fprintf(stderr, "listen failed, ip:port = %s:%d", IPADDR, PORT);
     perror(strerror(errno));
     return 1;
@@ -50,8 +49,7 @@ int main(void)
   max_fd = sock_listen;
 
   int loop = 0;
-  while (1)
-  {
+  while (1) {
     printf("loop times: %d\n", loop++);
 
     int i;
@@ -66,8 +64,7 @@ int main(void)
     select(max_fd + 1, &r, &w, &e, NULL);
 
     // 测试是否有客户端发起连接请求，如果有则接受并把新建的描述符加入监控
-    if (FD_ISSET(sock_listen, &r))
-    {
+    if (FD_ISSET(sock_listen, &r)) {
       int sock_conn = accept(sock_listen, NULL, NULL);
       printf("create new sock_conn %d\n", sock_conn);
 
@@ -77,9 +74,8 @@ int main(void)
     }
 
     // 5) 轮询各个文件描述符: 描述符依次递增，各系统的最大值可能有所不同，一般可以通过ulimit -n进行设置
-    for (i = sock_listen + 1; i < max_fd + 1; ++i)
-    {
-      if(FD_ISSET(i, &r) && FD_ISSET(i, &w)) {
+    for (i = sock_listen + 1; i < max_fd + 1; ++i) {
+      if (FD_ISSET(i, &r) && FD_ISSET(i, &w)) {
         doEchoAction(i, &r, &w);
       }
 
