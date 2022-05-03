@@ -55,9 +55,9 @@ int main() {
 
     // 6) 测试是否有客户端发起连接请求，如果有则接受并把新建的描述符加入监控
     if (fds[0].revents & POLLIN) {
-      int sock_conn = accept(sock_listen, NULL, NULL);
+      int client_fd = accept(sock_listen, NULL, NULL);
 
-      fds[nfds].fd = sock_conn;
+      fds[nfds].fd = client_fd;
       fds[nfds].events = POLLIN | POLLOUT;
 
       ++nfds;

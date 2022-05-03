@@ -55,7 +55,8 @@ int main(void) {
     int i;
     fd_set r, w, e;
 
-    // 为了重复使用readfds、writefds、exceptionfds，将他们复制到临时变量内
+    // 因为readfds、writefds、exceptionfds是输入输出形参数，
+    // 所以每次都需要将他们复制到临时变量内，避免重复修改
     memcpy(&r, &readfds, sizeof(fd_set));
     memcpy(&w, &writefds, sizeof(fd_set));
     memcpy(&e, &exceptfds, sizeof(fd_set));
